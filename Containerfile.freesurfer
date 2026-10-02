@@ -1,0 +1,28 @@
+# FreeSurfer
+
+FROM docker.io/library/ubuntu:24.04
+
+ARG FS_VERSION=8.2.0
+ARG DEBIAN_FRONTEND=noninteractive
+
+# --- System packages + FreeSurfer (official .deb; apt resolves its deps) --
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        ca-certificates curl \
+        tcsh bc libgomp1 \
+    && curl -fL --retry 3 -o /tmp/fs.deb \
+        "https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/${FS_VERSION}/freesurfer_ubuntu24-${FS_VERSION}_amd64.deb" \
+    && apt-get install -y --no-install-recommends /tmp/fs.deb \
+    && rm -rf /tmp/fs.deb /var/lib/apt/lists/*
+
+ENV FREESURFER_HOME=/usr/local/freesurfer/${FS_VERSION} \
+    FS_LICENSE=/opt/freesurfer/license.txt \
+    SUBJECTS_DIR=/data/subjects \
+    FSF_OUTPUT_FORMAT=nii.gz
+
+RUN mkdir -p /data/subjects /opt/freesurfer /work \
+    && echo 'source $FREESURFER_HOME/SetUpFreeSurfer.sh >/dev/null' >> /root/.bashrc
+
+WORKDIR /work
+ENTRYPOINT ["bash", "-c", "source \"$FREESURFER_HOME/SetUpFreeSurfer.sh\" >/dev/null && exec \"$@\"", "--"]
+CMD ["bash"]

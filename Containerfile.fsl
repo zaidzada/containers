@@ -1,0 +1,33 @@
+# FSL container
+
+FROM docker.io/library/ubuntu:24.04
+
+ARG FSL_VERSION=6.0.7.23
+ARG DEBIAN_FRONTEND=noninteractive
+
+ENV FSLDIR="/usr/local/fsl"
+ENV LANG="en_GB.UTF-8"
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+      bzip2           \
+      ca-certificates \
+      locales         \
+      python3         \
+      wget            \
+      file            \
+      dc              \
+      libquadmath0    \
+      libgtk2.0-0     \
+      libgomp1     && \
+    locale-gen en_GB.UTF-8 && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN wget -O /tmp/fslinstaller.py https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/releases/fslinstaller.py && \
+    python3 /tmp/fslinstaller.py -d "$FSLDIR" -V ${FSL_VERSION} && \
+    rm /tmp/fslinstaller.py
+
+# Load the FSL environment, then exec the given command (default: bash).
+# "$@" is filled from CMD or from the arguments passed to `podman run`.
+ENTRYPOINT [ "/bin/bash", "-c", ". \"$FSLDIR/etc/fslconf/fsl.sh\" && exec \"$@\"", "--" ]
+CMD [ "/bin/bash" ]
