@@ -1,7 +1,7 @@
 # Containers
 
 Podman images for neuroimaging. The Containerfiles here build FSL,
-FreeSurfer, and pycortex (on top of the FreeSurfer image) with pinned
+FreeSurfer, ANTs, and pycortex (on top of the FreeSurfer image) with pinned
 versions. Shell aliases run each tool on files in the current directory as if
 it were installed locally. Other tools come from upstream images, listed
 below.
@@ -30,6 +30,13 @@ FreeSurfer:
 podman build -f Containerfile.freesurfer -t freesurfer:8.2.0 .
 ```
 
+ANTs (official pre-built binaries):
+
+```sh
+podman build -f Containerfile.ants -t ants:2.6.5 .
+podman build -f Containerfile.ants --build-arg ANTS_VERSION=2.6.2 -t ants:2.6.2 .
+```
+
 pycortex (builds on the FreeSurfer image, so build that first):
 
 ```sh
@@ -54,6 +61,7 @@ Helpful aliases:
 ```sh
 alias pod='podman run --rm -v "$PWD":"$PWD" -w "$PWD"'
 alias fsl='pod localhost/fsl:6.0.7.23'
+alias ants='pod localhost/ants:2.6.5'
 alias freesurfer='pod -v "$SUBJECTS_DIR":/data/subjects -v "$FS_LICENSE":/opt/freesurfer/license.txt:ro,z localhost/freesurfer:8.2.0'
 ```
 
@@ -74,6 +82,7 @@ Use them:
 
 ```sh
 fsl siena --help
+ants antsRegistrationSyN.sh
 freesurfer mri_convert --help
 pyc           # IPython with cortex imported
 pyc bash      # shell with the FreeSurfer environment loaded
