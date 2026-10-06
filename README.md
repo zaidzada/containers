@@ -52,36 +52,45 @@ podman build --build-arg VERSION=2.1.0 -t pydeface:2.1.0 https://github.com/pold
 
 ## Usage
 
-FreeSurfer and pycortex need a (free) license from
-<https://surfer.nmr.mgh.harvard.edu/registration.html>, saved as
-`~/.freesurfer/license.txt`, with `FS_LICENSE` pointing at it.
-
-Helpful aliases:
-
-```sh
-alias pod='podman run --rm -v "$PWD":"$PWD" -w "$PWD"'
-alias fsl='pod localhost/fsl:6.0.7.23'
-alias ants='pod localhost/ants:2.6.5'
-alias freesurfer='pod -v "$SUBJECTS_DIR":/data/subjects -v "$FS_LICENSE":/opt/freesurfer/license.txt:ro,z localhost/freesurfer:8.2.0'
-```
-
-pycortex (needs `PYCORTEX_STORE`, `SUBJECTS_DIR`, and `FS_LICENSE` set to
-existing host paths):
-
 ```bash
-alias pyc='podman run --rm -it \
-  -v "$PYCORTEX_STORE":/data/pycortex-db:z \
-  -v "$SUBJECTS_DIR":/data/subjects:z \
-  -v "$FS_LICENSE":/opt/freesurfer/license.txt:ro,z \
-  -v "$PWD":/work:z \
-  -p 127.0.0.1:8900:8900 \
-  localhost/pycortex:1.4.0'
+pod() {
+  podman run --rm -v "$PWD":"$PWD" -w "$PWD" "$@";
+}
+
+fsl() {
+  pod localhost/fsl:6.0.7.23 "$@";
+}
+
+synthstrip() {
+  pod -v "$PWD/nifti":/data:rw freesurfer/synthstrip:1.8 "$@";
+}
+
+ants() {
+  pod localhost/ants:2.6.5 "$@";
+}
+
+freesurfer() {
+  pod -v "$SUBJECTS_DIR":/data/subjects \
+      -v "$FS_LICENSE":/opt/freesurfer/license.txt:ro,z \
+      localhost/freesurfer:8.2.0 "$@" 
+}
+
+pyc() { 
+  podman run --rm -it \
+      -v "$PYCORTEX_STORE":/data/pycortex-db:z \
+      -v "$SUBJECTS_DIR":/data/subjects:z \
+      -v "$FS_LICENSE":/opt/freesurfer/license.txt:ro,z \
+      -v "$PWD":/work:z \
+      -p 127.0.0.1:8900:8900 \
+      localhost/pycortex:1.4.0'
+}
+
 ```
 
-Use them:
+**Note**: FreeSurfer and pycortex need a (free) license from <https://surfer.nmr.mgh.harvard.edu/registration.html>, saved as `~/.freesurfer/license.txt`, with `FS_LICENSE` pointing at it. `pyc` (needs `PYCORTEX_STORE`, `SUBJECTS_DIR`, and `FS_LICENSE` set to existing host paths). Then, you can use these functions like so:
 
 ```sh
-fsl siena --help
+fsl bet --help
 ants antsRegistrationSyN.sh
 freesurfer mri_convert --help
 pyc           # IPython with cortex imported
