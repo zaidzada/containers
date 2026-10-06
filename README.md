@@ -82,7 +82,7 @@ pyc() {
       -v "$FS_LICENSE":/opt/freesurfer/license.txt:ro,z \
       -v "$PWD":/work:z \
       -p 127.0.0.1:8900:8900 \
-      localhost/pycortex:1.4.0'
+      localhost/pycortex:1.4.0
 }
 
 ```
