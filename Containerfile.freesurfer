@@ -1,6 +1,6 @@
 # FreeSurfer
 
-FROM docker.io/library/ubuntu:24.04
+FROM docker.io/library/ubuntu:22.04
 
 ARG FS_VERSION=8.2.0
 ARG DEBIAN_FRONTEND=noninteractive
@@ -11,7 +11,7 @@ RUN apt-get update \
         ca-certificates curl \
         tcsh bc libgomp1 \
     && curl -fL --retry 3 -o /tmp/fs.deb \
-        "https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/${FS_VERSION}/freesurfer_ubuntu24-${FS_VERSION}_amd64.deb" \
+        "https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/${FS_VERSION}/freesurfer_ubuntu22-${FS_VERSION}_amd64.deb" \
     && apt-get install -y --no-install-recommends /tmp/fs.deb \
     && rm -rf /tmp/fs.deb /var/lib/apt/lists/*
 

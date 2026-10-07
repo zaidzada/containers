@@ -28,6 +28,7 @@ FreeSurfer:
 
 ```sh
 podman build -f Containerfile.freesurfer -t freesurfer:8.2.0 .
+podman build -f Containerfile.freesurfer --build-arg FS_VERSION=8.1.0 -t freesurfer:8.1.0 .
 ```
 
 ANTs (official pre-built binaries):
